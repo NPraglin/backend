@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const placesRoutes = require('./routes/places-routes');
+const usersRoutes = require('./routes/users-routes')
 const HttpError = require ('./models/http-error');
 
 const app = express();
@@ -11,6 +12,7 @@ app.use(bodyParser.json());
 
 // Send all requests to that start with /api/places
 app.use('/api/places', placesRoutes);
+app.use('/api/users', usersRoutes);
 
 // Middleware handling all failed GET requests
 app.use('/', (req, res, next) => {
