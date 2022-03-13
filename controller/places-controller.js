@@ -1,6 +1,7 @@
 const { v4: uuidv4 } = require('uuid');
 const { validationResult} = require('express-validator');
 const HttpError = require('../models/http-error');
+const getCoordsForAddress = require('../util/location');
 
 let DUMMY_PLACES = [
   {
@@ -46,17 +47,24 @@ const getPlacesByUserId = (req, res, next) => {
 };
 
 // Exported to places-routes, gets data out of POST body
-const createPlace = (req, res, next) => {
+const createPlace = async (req, res, next) => {
   // Looks intio this function and detects validation errors and returns them form the initial middleware validation
   const errors = validationResult(req);
   if(!errors.isEmpty()) {
     console.log(errors)
-    throw new HttpError('Invalid inputs, please check your data', 422)
+    // Async code requires the use of next() on errors rather than throw
+    return next(new HttpError('Invalid inputs, please check your data', 422))
   }
 
   // Deconstruct object and store in consts
-  const { title, description, coordinates, address, creator } = req.body;
+  const { title, description, address, creator } = req.body;
 
+  let coordinates;
+  try {
+    coordinates = await getCoordsForAddress(address);
+  } catch (error) {
+    return next(error);
+  }
   const createdPlace = {
     id: uuidv4(),
     title,
