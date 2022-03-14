@@ -2,6 +2,7 @@ const { v4: uuidv4 } = require('uuid');
 const { validationResult} = require('express-validator');
 const HttpError = require('../models/http-error');
 const getCoordsForAddress = require('../util/location');
+const Place = require('../models/place');
 
 let DUMMY_PLACES = [
   {
@@ -17,33 +18,41 @@ let DUMMY_PLACES = [
   }
 ]
 // Exported to places-routes, gets value of parameter in GET request from params
-const getPlaceById = (req, res, next) => {
+const getPlaceById = async (req, res, next) => {
   const placeId = req.params.pid; // holds an object of my dynamic segments as KEYS. Value is sent in the url
 
-  // must return true
-  const place = DUMMY_PLACES.find(p => {
-    return p.id === placeId
-  })
+  let place;
+  // Mongoose static method that finds records by ID.. returns place by id
+  try {place = await Place.findById(placeId);} catch (err) {
+    const error = new HttpError('Could not find place for id', 500);
+    return next(error);
+  }
+
   // No place? => error function from import
   if (!place) {
     throw new HttpError('Could not find place for place ID.', '404');
   }
-  // Place? => render place
-    res.json({place}); // => { place: place }
+  // Place? => render place with getters to avoid non-id
+    res.json({place: place.toObject({getters: true})}); // => { place: place }
 };
 
 // Exported to places-routes, gets value of parameter in GET request from params
-const getPlacesByUserId = (req, res, next) => {
+const getPlacesByUserId = async (req, res, next) => {
   const userId = req.params.uid;
-  const places = DUMMY_PLACES.filter(p => {
-    return p.creator === userId
-  })
+
+  let places;
+  try {
+  places = await Place.find({ creator: userId })
+  } catch (err) {
+    const error = new HttpError('Could not find any locations for user', 500);
+    return next(error);
+  }
   // No place? => error function from import
   if (!places || places.length === 0) {
-    throw new HttpError('Could not find places for the provideduser ID.', '404');
+    return next(HttpError('Could not find places for the provideduser ID.', '404'));
   }
-  // Place? => render place
-    res.json({places}); // => { place: place }
+  // Place? => render place and map them to objects for each place
+  res.json({places: places.map(place => place.toObject({getters: true}))}); // => { place: place }
 };
 
 // Exported to places-routes, gets data out of POST body
@@ -65,16 +74,25 @@ const createPlace = async (req, res, next) => {
   } catch (error) {
     return next(error);
   }
-  const createdPlace = {
-    id: uuidv4(),
-    title,
-    description,
+  // Place constructor (object constructor with Schema)
+  const createdPlace = new Place({
+    title: title,
+    description: description,
+    image: 'https://picsum.photos/400',
     location: coordinates,
-    address,
-    creator
-  };
+    address: address,
+    creator: creator
+  });
 
-  DUMMY_PLACES.push(createdPlace); //unshift(createdPlace)
+  // Saves object to be prepared to store in DB and generates unique ID's
+  try {await createdPlace.save()}
+  catch (err) {
+    console.log(err)
+    const error = new HttpError(
+      'Creating place failed', 500
+    );
+    return next(error);
+  }
 
   // Success code returning place
   res.status(201).json({place: createdPlace})
