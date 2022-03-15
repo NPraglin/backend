@@ -92,8 +92,8 @@ const updatePlace = async (req, res, next) => {
   // Looks into this function and detects validation errors and returns them form the initial middleware validation
   const errors = validationResult(req);
   if(!errors.isEmpty()) {
-    console.log(errors)
-    throw new HttpError('Invalid inputs, please check your data', 422)
+    console.log(errors);
+    return next (HttpError('Invalid inputs, please check your data', 422));
   }
 
   const { title, description } = req.body;
