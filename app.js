@@ -11,6 +11,17 @@ const app = express();
 // Middleware parsing incoming request body, extracts data to JSON, and calls next => next middleware in-line
 app.use(bodyParser.json());
 
+// Middleware working around CORS by adding specific headers to the response
+app.use((req, res, next) => {
+  // Controls which domains are allowed (* = all)
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  // Allows origin, x requested, content type, accept, and authorization headers through
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested, Content-Type, Accept, Aiuthorization');
+  // Allowss access for the following HTTP methods
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE')
+  next();
+})
+
 // Send all requests to that start with /api/places
 app.use('/api/places', placesRoutes);
 app.use('/api/users', usersRoutes);

@@ -77,13 +77,16 @@ const createPlace = async (req, res, next) => {
     creator: creator
   });
 
+  // Debugger console log
+  console.log(createdPlace);
+
   // Next block of code is to get the user for place assignment
   let user;
   try {
     // Finds the user we want to put the place under by selecting from creator id (they should match otherwise throw error)
     user = await User.findById(creator);
   } catch (err) {
-    const error = new HttpError('Creating Place Failed, please try again', 500);s
+    const error = new HttpError('Creating Place Failed at step: finding user, please try again', 500);s
     return next(error)
   }
   // If no user... return error
@@ -97,18 +100,24 @@ const createPlace = async (req, res, next) => {
   // Transaction allows use of multiple operations.. built upon sessions
   // Start a session!
   try {
+    console.log('step1: create sesh')
     const sesh = await mongoose.startSession();
     // Start a transaction and tell mongoose what we want to do
     // Transaction will not create a new collection
+    console.log('step2: start transaction')
     sesh.startTransaction();
     // Now we save, with our session passed in as an object
+    console.log('step3: save place')
     await createdPlace.save({session: sesh});
-    // Now that place is created/stored.. we need to ensure the ID is added to the user's list
+    // Now that place is created/stored..  ensure the ID is added to the user's list
     // This is a MONGOOSE PUSH, not a standard array PUSH.. allows mongoose to connect two models
+    console.log('step4: push place')
     user.places.push(createdPlace);
     // Update user now that we pushed the place on
+    console.log('step5: save sesh')
     await user.save({session: sesh});
     // Commit and close
+    console.log('step6: commit trans')
     sesh.commitTransaction();
   }
   catch (err) {
@@ -120,7 +129,7 @@ const createPlace = async (req, res, next) => {
   }
 
   // Success code returning place
-  res.status(201).json({place: createdPlace})
+  res.status(201).json({place: createdPlace.toObject({getters: true})})
 };
 
 // Middleware Function to update the place via Http Patch Request
