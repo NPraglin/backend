@@ -181,9 +181,21 @@ const deletePlace = async (req, res, next) => {
     return next(error);
   }
 
+  // Transaction allows use of multiple operations.. built upon sessions
+  // Start a session!
   try {
-    // Remove
-    await place.remove();
+    const sesh = await mongoose.startSession();
+    // Start a transaction and tell mongoose what we want to do
+    // Transaction will not create a new collection
+    sesh.startTransaction();
+    // Now we save, with our session passed in as an object
+    await place.remove({session: sesh});
+    // Access our place via creator, and MONGOOSE PULL it out of the array.. remove place
+    place.creator.places.pull(place);
+    // Update user now that we removed the place.. save that boi
+    await place.creator.save({session: sesh});
+    // Commit and close
+    sesh.commitTransaction();
   } catch (err) {
     const error = new HttpError('Could not delete place', 500);
     return next(error);
