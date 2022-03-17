@@ -3,6 +3,8 @@ const { validationResult} = require('express-validator');
 const HttpError = require('../models/http-error');
 const getCoordsForAddress = require('../util/location');
 const Place = require('../models/place');
+const User = require('../models/user');
+const { default: mongoose } = require('mongoose');
 
 // Exported to places-routes, gets value of parameter in GET request from params
 // Http Get Request returns place
@@ -57,13 +59,14 @@ const createPlace = async (req, res, next) => {
   // Deconstruct object and store in consts
   const { title, description, address, creator } = req.body;
 
+  // Using our Google API to return coords by address
   let coordinates;
   try {
     coordinates = await getCoordsForAddress(address);
   } catch (error) {
     return next(error);
   }
-  // Place constructor (object constructor with Schema)
+  // Place constructor (object constructor with Schema).. taking user input from POST body
   const createdPlace = new Place({
     title: title,
     description: description,
@@ -73,8 +76,40 @@ const createPlace = async (req, res, next) => {
     creator: creator
   });
 
-  // Saves object to be prepared to store in DB and generates unique ID's
-  try {await createdPlace.save()}
+  // Next block of code is to get the user for place assignment
+  let user;
+  try {
+    // Finds the user we want to put the place under by selecting from creator id (they should match otherwise throw error)
+    user = await User.findById(creator);
+  } catch (err) {
+    const error = new HttpError('Creating Place Failed, please try again', 500);s
+    return next(error)
+  }
+  // If no user... return error
+  if (!user) {
+    const error = new HttpError('Could not find user for provided ID', 404);
+    return next(error);
+  }
+  // Just to confirm, we'll console log the user
+  console.log(user)
+
+  // Transaction allows use of multiple operations.. built upon sessions
+  // Start a session!
+  try {
+    const sesh = await mongoose.startSession();
+    // Start a transaction and tell mongoose what we want to do
+    // Transaction will not create a new collection
+    sesh.startTransaction();
+    // Now we save, with our session passed in as an object
+    await createdPlace.save({session: sesh});
+    // Now that place is created/stored.. we need to ensure the ID is added to the user's list
+    // This is a MONGOOSE PUSH, not a standard array PUSH.. allows mongoose to connect two models
+    user.places.push(createdPlace);
+    // Update user now that we pushed the place on
+    await user.save({session: sesh});
+    // Commit and close
+    sesh.commitTransaction();
+  }
   catch (err) {
     console.log(err)
     const error = new HttpError(
@@ -133,11 +168,19 @@ const deletePlace = async (req, res, next) => {
   let place;
   // Mongoose static method that finds records by ID.. returns place by id
   try {
-    place = await Place.findById(placeID);
+    // populate relates the two collections by parameter
+    place = await Place.findById(placeID).populate('creator');
   } catch (err) {
     const error = new HttpError('Could not delete place', 500);
     return next(error);
   }
+
+  // General error returning logic here
+  if (!place) {
+    const error = new HttpError('Could not find place for this ID', 404);
+    return next(error);
+  }
+
   try {
     // Remove
     await place.remove();
