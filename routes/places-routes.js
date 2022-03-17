@@ -3,8 +3,6 @@ const express = require('express');
 // Object destructuring is revolutionary
 const { check } = require('express-validator');
 
-const HttpError = require('../models/http-error');
-
 const placesControllers = require('../controller/places-controller');
 
 const router = express.Router();
