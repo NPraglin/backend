@@ -13,7 +13,7 @@ const placeSchema = new Schema({
       lng: {type: Number, required: true}
     },
     address: {type: String, required: true},
-    creator: {type: String, required: true}
+    creator: {type: mongoose.Types.ObjectId, required: true, ref: 'User'}
 });
 
 // Mongoose specific model export for schemas
