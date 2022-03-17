@@ -31,19 +31,21 @@ const getPlaceById = async (req, res, next) => {
 const getPlacesByUserId = async (req, res, next) => {
   const userId = req.params.uid;
 
-  let places;
+  //let places;
+  let userWithPlaces
   try {
-  places = await Place.find({ creator: userId })
+    // populate method to get corresponding places for the user ID (similar to joining two DB's)
+    userWithPlaces = await User.findById(userId).populate('places')
   } catch (err) {
     const error = new HttpError('Could not find any locations for user', 500);
     return next(error);
   }
   // No place? => error function from import
-  if (!places || places.length === 0) {
+  if (!userWithPlaces || userWithPlaces.places.length === 0) {
     return next(HttpError('Could not find places for the provideduser ID.', '404'));
   }
   // Place? => render place and map them to objects for each place
-  res.json({places: places.map(place => place.toObject({getters: true}))}); // => { place: place }
+  res.json({places: userWithPlaces.places.map(place => place.toObject({getters: true}))}); // => { place: place }
 };
 
 // Exported to places-routes, gets data out of POST body - Http Post Request
