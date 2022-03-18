@@ -86,7 +86,7 @@ const createPlace = async (req, res, next) => {
     // Finds the user we want to put the place under by selecting from creator id (they should match otherwise throw error)
     user = await User.findById(creator);
   } catch (err) {
-    const error = new HttpError('Creating Place Failed at step: finding user, please try again', 500);s
+    const error = new HttpError('Creating Place Failed at step: finding user, please try again', 500);
     return next(error)
   }
   // If no user... return error
@@ -112,7 +112,8 @@ const createPlace = async (req, res, next) => {
     // Now that place is created/stored..  ensure the ID is added to the user's list
     // This is a MONGOOSE PUSH, not a standard array PUSH.. allows mongoose to connect two models
     console.log('step4: push place')
-    user.places.push(createdPlace);
+    await user.places.push(createdPlace._id);
+    console.log(user.places)
     // Update user now that we pushed the place on
     console.log('step5: save sesh')
     await user.save({session: sesh});
