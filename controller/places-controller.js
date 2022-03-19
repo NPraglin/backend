@@ -112,7 +112,7 @@ const createPlace = async (req, res, next) => {
     // Now that place is created/stored..  ensure the ID is added to the user's list
     // This is a MONGOOSE PUSH, not a standard array PUSH.. allows mongoose to connect two models
     console.log('step4: push place')
-    await user.places.push(createdPlace._id);
+    await user.places.push(createdPlace);
     console.log(user.places)
     // Update user now that we pushed the place on
     console.log('step5: save sesh')

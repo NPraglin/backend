@@ -1,5 +1,5 @@
 // Schema to make users object
-
+const Place = require('./place');
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
 const Schema = mongoose.Schema;
@@ -9,11 +9,11 @@ const userSchema = new Schema({
     email: {type: String, required: true, unique: true},
     password: {type: String, required: true,     minlength: 6},
     image: {type: String, required: true},
-    places: [{type: mongoose.Types.ObjectId, required: true, ref: 'Place'}]
+    places: [Place.schema]
 });
 
 // Mongoose function to plugin the validator which validates our email field
-userSchema.plugin(uniqueValidator);
+// userSchema.plugin(uniqueValidator);
 
 
 // Mongoose specific model export for schemas
