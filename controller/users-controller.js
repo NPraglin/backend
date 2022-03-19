@@ -52,7 +52,8 @@ const signup = async (req, res, next) => {
     name,
     email,
     password,
-    image: 'https://picsum.photos/200'
+    image: 'https://picsum.photos/200',
+    places: []
   });
   // await and save our user
   try {await createdUser.save()}
