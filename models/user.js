@@ -9,7 +9,7 @@ const userSchema = new Schema({
     email: {type: String, required: true, unique: true},
     password: {type: String, required: true,     minlength: 6},
     image: {type: String, required: true},
-    places: [Place.schema]
+    places: [{type: String, required: true}]
 });
 
 // Mongoose function to plugin the validator which validates our email field
