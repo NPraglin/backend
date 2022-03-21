@@ -23,7 +23,6 @@ const signup = async (req, res, next) => {
   // Looks intio this function and detects validation errors and returns them form the initial middleware validation
   const errors = validationResult(req);
   if(!errors.isEmpty()) {
-    console.log(errors);
     // Always return next in async rather than throw
     return next(
       new HttpError('Invalid inputs, please check your data', 422)
@@ -52,7 +51,7 @@ const signup = async (req, res, next) => {
     name,
     email,
     password,
-    image: 'https://picsum.photos/200',
+    image: req.file.path,
     places: []
   });
   // await and save our user

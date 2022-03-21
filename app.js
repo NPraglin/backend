@@ -5,6 +5,8 @@ const api = require('./util/api_url');
 const placesRoutes = require('./routes/places-routes');
 const usersRoutes = require('./routes/users-routes')
 const HttpError = require ('./models/http-error');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 
@@ -22,6 +24,10 @@ app.use((req, res, next) => {
   next();
 })
 
+// Handling images in the middle
+// Builds a new path pointing to images/uploads and any file if requested are returned
+app.use('/uploads/images', express.static(path.join('uploads', 'images')));
+
 // Send all requests to that start with /api/places
 app.use('/api/places', placesRoutes);
 app.use('/api/users', usersRoutes);
@@ -34,6 +40,13 @@ app.use('/', (req, res, next) => {
 
 // Middleware function to render error routes
 app.use((error, req, res, next) => {
+  // Checks for file to delete
+  if (req.file) {
+    // Using FS import
+    fs.unlink(req.file.path, (err) => {
+      console.log(err);
+    });
+  }
   // Check if response already been sent
   if (res.headerSent) {
     return next(error)
