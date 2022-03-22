@@ -4,6 +4,7 @@ const getCoordsForAddress = require('../util/location');
 const Place = require('../models/place');
 const User = require('../models/user');
 const { default: mongoose } = require('mongoose');
+const fs = require('fs');
 
 // Exported to places-routes, gets value of parameter in GET request from params
 // Http Get Request returns place
@@ -192,6 +193,9 @@ const deletePlace = async (req, res, next) => {
     return next(error);
   }
 
+  // Get that imagepath to delete later on line 220
+  const imagePath = place.image;
+
   // Transaction allows use of multiple operations.. built upon sessions
   // Start a session!
   try {
@@ -211,6 +215,11 @@ const deletePlace = async (req, res, next) => {
     const error = new HttpError('Could not delete place', 500);
     return next(error);
   }
+
+  // Delete Place using fs import and unlink
+  fs.unlink(imagePath, err => {
+    console.log(err);
+  });
   
   res.status(200).json({message: "Deleted place."});
 };
