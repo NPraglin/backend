@@ -2,6 +2,8 @@ const { validationResult } = require('express-validator');
 const User = require('../models/user');
 
 const HttpError = require('../models/http-error')
+// Library for hashing passwords
+const bcrypt = require('bcryptjs');
 
 // Gets users on the GET request
 const getUsers = async (req, res, next) => {
@@ -46,11 +48,21 @@ const signup = async (req, res, next) => {
     const error = new HttpError('User already exists. Please login instead.', 422);
     return next(error);
   }
+
+  // Hash password
+  let hashedPassword;
+  try {
+  hashedPassword = await bcrypt.hash(password, 12); // 12 Salt rounds
+  } catch (err) {
+    const error = new HttpError('Could not create user, please try again', 500)
+    return next(error)
+  }
+
   // create new user and add to users list
   const createdUser = new User({
     name,
     email,
-    password,
+    password: hashedPassword,
     image: req.file.path,
     places: []
   });
@@ -83,8 +95,24 @@ const login = async (req, res, next) => {
     return next(error);
   }
 
-  // Checks user exists or password matches
-  if (!existingUser || existingUser.password !== password) {
+  // Checks user exists
+  if (!existingUser) {
+    const error = new HttpError(
+      'Invalid credentials, could not log you in.', 401
+    );
+    return next(error)
+  }
+
+  // Use bcrypt to compare password to stored hashed pw in db
+  let isValidPassword = false;
+  try {
+  isValidPassword = await bcrypt.compare(password, existingUser.password) // returns boolean
+  } catch (err) {
+    const error = new HttpError('Could not log you in. Please check your credentials', 500)
+    return next(error)
+  }
+
+  if (!isValidPassword) {
     const error = new HttpError(
       'Invalid credentials, could not log you in.', 401
     );

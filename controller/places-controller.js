@@ -42,7 +42,8 @@ const getPlacesByUserId = async (req, res, next) => {
   }
   // No place? => error function from import
   if (!userWithPlaces || userWithPlaces.places.length === 0) {
-    return next(HttpError('Could not find places for the provideduser ID.', '404'));
+    const error = new HttpError('Could not find any locations for user', 500)
+    return next(error);
   }
   // Place? => render place and map them to objects for each place
   res.json({places: userWithPlaces.places.map(place => place.toObject({getters: true}))}); // => { place: place }
