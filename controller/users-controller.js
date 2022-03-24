@@ -5,6 +5,11 @@ const HttpError = require('../models/http-error')
 // Library for hashing passwords
 const bcrypt = require('bcryptjs');
 
+// Cookies library
+const jwt = require('jsonwebtoken');
+
+
+
 // Gets users on the GET request
 const getUsers = async (req, res, next) => {
   // Find user by email n name.. odd mongo syntax to query the db and find all matching params LESS password
@@ -75,8 +80,20 @@ const signup = async (req, res, next) => {
     );
     return next(error);
   }
-  // Success code returning place
-  res.status(201).json({user: createdUser.toObject({getters: true})})
+
+  // creating session token / cookie
+  let token;
+  try {
+  token = jwt.sign({ userId: createdUser.id, email: createdUser.email }, 'supersecret_dont_share', { expiresIn: '1h' });
+  } catch (err) {
+    const error = new HttpError(
+      'Creating User failed.. Please try again', 500
+    );
+    return next(error)
+  }
+
+  // Success code returning info and token
+  res.status(201).json({userId: createdUser.id, email: createdUser.email, token: token})
 };
 
 
@@ -119,10 +136,23 @@ const login = async (req, res, next) => {
     return next(error)
   }
 
+  // Generate token for login
+  // This token needs to match the token from signup
+  let token;
+  try {
+  token = jwt.sign({ userId: existingUser.id, email: existingUser.email }, 'supersecret_dont_share', { expiresIn: '1h' });
+  } catch (err) {
+    const error = new HttpError(
+      'Creating User failed.. Please try again', 500
+    );
+    return next(error)
+  }
+
   res.json(
     {
-      message: 'Loggged in!', 
-      user: existingUser.toObject({ getters: true })
+      userId: existingUser.id, 
+      email: existingUser.email,
+      token: token
   });
 };
 

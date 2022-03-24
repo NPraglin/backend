@@ -18,7 +18,7 @@ app.use((req, res, next) => {
   // Controls which domains are allowed (* = all)
   res.setHeader('Access-Control-Allow-Origin', '*');
   // Allows origin, x requested, content type, accept, and authorization headers through
-  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested, Content-Type, Accept, Aiuthorization');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested, Content-Type, Accept, Authorization');
   // Allowss access for the following HTTP methods
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE')
   next();
