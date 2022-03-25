@@ -92,7 +92,7 @@ const signup = async (req, res, next) => {
     return next(error)
   }
 
-  // Success code returning info and token
+  // Success code returning info and token and passes to front end!
   res.status(201).json({userId: createdUser.id, email: createdUser.email, token: token})
 };
 

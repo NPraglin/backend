@@ -17,6 +17,7 @@ router.get('/:pid', placesControllers.getPlaceById);
 // Function imported from places-controller
 router.get('/user/:uid', placesControllers.getPlacesByUserId);
 
+// Middleware function to handle validation of session
 router.use(checkAuth);
 
 // Midleware function handlingg POST request for creating a place. Express-Validator.check is ensuring validity of input
