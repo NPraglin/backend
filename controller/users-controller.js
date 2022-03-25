@@ -1,6 +1,6 @@
 const { validationResult } = require('express-validator');
 const User = require('../models/user');
-
+require('dotenv').config();
 const HttpError = require('../models/http-error')
 // Library for hashing passwords
 const bcrypt = require('bcryptjs');
@@ -84,7 +84,7 @@ const signup = async (req, res, next) => {
   // creating session token / cookie
   let token;
   try {
-  token = jwt.sign({ userId: createdUser.id, email: createdUser.email }, 'supersecret_dont_share', { expiresIn: '1h' });
+  token = jwt.sign({ userId: createdUser.id, email: createdUser.email }, process.env.JWT_KEY, { expiresIn: '1h' });
   } catch (err) {
     const error = new HttpError(
       'Creating User failed.. Please try again', 500
@@ -140,7 +140,7 @@ const login = async (req, res, next) => {
   // This token needs to match the token from signup
   let token;
   try {
-  token = jwt.sign({ userId: existingUser.id, email: existingUser.email }, 'supersecret_dont_share', { expiresIn: '1h' });
+  token = jwt.sign({ userId: existingUser.id, email: existingUser.email }, process.env.JWT_KEY, { expiresIn: '1h' });
   } catch (err) {
     const error = new HttpError(
       'Creating User failed.. Please try again', 500

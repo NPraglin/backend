@@ -7,6 +7,7 @@ const usersRoutes = require('./routes/users-routes')
 const HttpError = require ('./models/http-error');
 const fs = require('fs');
 const path = require('path');
+require('dotenv').config();
 
 const app = express();
 

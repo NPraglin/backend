@@ -14,7 +14,7 @@ module.exports = (req, res, next) => {
     throw new Error('Authentication failed! Line 14 check-auth');
   }
   // Step 1: Validate/Verify that token
-  const decodedToken = jwt.verify(token, 'supersecret_dont_share');
+  const decodedToken = jwt.verify(token, process.env.JWT_KEY);
 
   // Step 2: Add data to req.. Adds data to the request! Adding the user ID
   req.userData = {userId: decodedToken.userId}
