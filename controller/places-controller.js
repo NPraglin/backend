@@ -76,7 +76,7 @@ const createPlace = async (req, res, next) => {
     image: req.file.path,
     location: coordinates,
     address: address,
-    creator: creator
+    creator: req.userData.userId
   });
 
   // Debugger console log
@@ -86,7 +86,7 @@ const createPlace = async (req, res, next) => {
   let user;
   try {
     // Finds the user we want to put the place under by selecting from creator id (they should match otherwise throw error)
-    user = await User.findById(creator);
+    user = await User.findById(req.userData.userId);
   } catch (err) {
     const error = new HttpError('Creating Place Failed at step: finding user, please try again', 500);
     return next(error)
@@ -115,7 +115,6 @@ const createPlace = async (req, res, next) => {
     // This is a MONGOOSE PUSH, not a standard array PUSH.. allows mongoose to connect two models
     console.log('step4: push place')
     await user.places.push(createdPlace._id);
-    console.log(user.places)
     // Update user now that we pushed the place on
     console.log('step5: save sesh')
     await user.save({session: sesh});
@@ -157,6 +156,12 @@ const updatePlace = async (req, res, next) => {
     return next(error);
   }
 
+  // Verify the editor IS the creator
+  if (place.creator.toString() !== req.userData.userId) {
+    const error = new HttpError('You are not allowed to edit this place', 401);
+    return next(error);
+  }
+
   // Const is able to be updated because it stores the address of the object rather than the actual object
   place.title = title;
   place.description = description;
@@ -191,6 +196,12 @@ const deletePlace = async (req, res, next) => {
   // General error returning logic here
   if (!place) {
     const error = new HttpError('Could not find place for this ID', 404);
+    return next(error);
+  }
+
+  // Verify the user is the creator before deleting
+  if (place.creator.id !== req.userData.userId) {
+    const error = new HttpError('You are not authorized to delete this place', 401);
     return next(error);
   }
 
