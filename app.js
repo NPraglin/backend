@@ -60,7 +60,7 @@ app.use((error, req, res, next) => {
 
 // Initialize DB connection with Mongoose
 mongoose.connect(api.url).then(() => {
-  app.listen(5000)
+  app.listen(process.env.PORT || 5000)
 }).catch(err => {
   console.log(err);
 });
