@@ -8,8 +8,6 @@ const bcrypt = require('bcryptjs');
 // Cookies library
 const jwt = require('jsonwebtoken');
 
-
-
 // Gets users on the GET request
 const getUsers = async (req, res, next) => {
   // Find user by email n name.. odd mongo syntax to query the db and find all matching params LESS password
