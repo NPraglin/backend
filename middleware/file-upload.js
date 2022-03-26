@@ -1,6 +1,6 @@
 const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
-let fs = require('fs-extra');
+let fs = require('fs');
 // Maps mime types
 const MIME_TYPE_MAP = {
   'image/png': 'png',
