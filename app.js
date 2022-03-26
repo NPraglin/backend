@@ -28,7 +28,7 @@ app.use((req, res, next) => {
 
 // Handling images in the middle
 // Builds a new path pointing to images/uploads and any file if requested are returned
-app.use('/src/uploads/images', express.static(path.join('src', 'uploads', 'images')));
+app.use('/app/uploads/images', express.static(path.join('app', 'uploads', 'images')));
 
 // Send all requests to that start with /api/places
 app.use('/api/places', placesRoutes);

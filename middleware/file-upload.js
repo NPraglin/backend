@@ -12,7 +12,7 @@ const fileUpload = multer({
   limits: 500000, // bytes - 500kb
   storage: multer.diskStorage({
     destination: (req, file, cb) => {
-      let path = 'src/uploads/images';
+      let path = 'app/uploads/images';
       fs.mkdirSync(path);
       cb(null, path);
     },
