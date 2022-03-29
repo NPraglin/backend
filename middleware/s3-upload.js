@@ -56,4 +56,4 @@ const s3Upload = (req, res, next) => {
   });
 }
 
-module.exports = s3Upload;
+exports.s3Upload = s3Upload;
