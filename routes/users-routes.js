@@ -13,7 +13,7 @@ router.get('/', usersController.getUsers)
 // Midleware function grabbing post req from signup
 router.post('/signup', 
 // Multer middlware single call file upload image
-s3Upload.s3Upload,
+s3Upload.upload.single('image'),
 [
   check('name').not().isEmpty(),
   check('email').normalizeEmail().isEmail(), // valoidates an email addy
