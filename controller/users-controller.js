@@ -66,7 +66,7 @@ const signup = async (req, res, next) => {
     name,
     email,
     password: hashedPassword,
-    image: req.file,
+    image: req.file.key,
     places: []
   });
   console.log('created user log', createdUser)
