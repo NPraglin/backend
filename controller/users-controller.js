@@ -69,7 +69,7 @@ const signup = async (req, res, next) => {
     image: req.file.key,
     places: []
   });
-  console.log('created user log', createdUser)
+  
   // await and save our user
   try {await createdUser.save()}
   catch (err) {
