@@ -41,7 +41,6 @@ const upload = () => {
 }
 // s3 multer
 const s3Upload = (req, res, next) => {
-  console.log(req)
 
   const uploadSingle = upload().single('image');
 
