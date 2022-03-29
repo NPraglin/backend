@@ -1,9 +1,9 @@
 const express = require('express');
 const { check } = require('express-validator');
 const fileUpload = require('../middleware/file-upload');
-const s3upload = require('../middleware/s3-upload');
 
 const usersController = require('../controller/users-controller');
+const s3Upload = require('../middleware/s3-upload');
 
 const router = express.Router();
 
@@ -13,7 +13,7 @@ router.get('/', usersController.getUsers)
 // Midleware function grabbing post req from signup
 router.post('/signup', 
 // Multer middlware single call file upload image
-s3upload(),
+s3Upload.s3Upload,
 [
   check('name').not().isEmpty(),
   check('email').normalizeEmail().isEmail(), // valoidates an email addy

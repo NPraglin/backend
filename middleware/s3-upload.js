@@ -24,7 +24,7 @@ const MIME_TYPE_MAP = {
 }
 // s3 file upload func
 const upload = () => {
-  const upload = multer({
+  multer({
     // limits: 500000, // bytes - 500kb
     storage: multerS3({
       s3: s3,
