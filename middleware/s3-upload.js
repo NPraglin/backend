@@ -30,7 +30,7 @@ const upload = () => {
       s3: s3,
       bucket:process.env.S3_BUCKET,
       metadata: function (req, file, cb) {
-        cb(null, { fieldName: file.filedname });
+        cb(null, { fieldName: file.fieldname });
       },
       key: function(req, file, cb) {
         const ext = MIME_TYPE_MAP[file.mimetype];
@@ -41,7 +41,7 @@ const upload = () => {
 }
 // s3 multer
 const s3Upload = (req, res, next) => {
-  console.log(req.files)
+  console.log(req)
 
   const uploadSingle = upload().single('image');
 
@@ -50,7 +50,7 @@ const s3Upload = (req, res, next) => {
       return res.status(400).json({ success: false, message: err.message})
     };
 
-    console.log(req.files)
+    console.log(req)
 
     res.status(200).json({ data: req.files })
   });
