@@ -1,12 +1,11 @@
 const express = require('express');
-const fileUpload = require('../middleware/file-upload');
-const s3upload = require('../middleware/s3-upload');
 // Object destructuring is revolutionary
 const { check } = require('express-validator');
 
 const placesControllers = require('../controller/places-controller');
 
 const checkAuth = require('../middleware/check-auth');
+const s3Upload = require('../middleware/s3-upload');
 
 const router = express.Router();
 
@@ -23,7 +22,7 @@ router.use(checkAuth);
 
 // Midleware function handlingg POST request for creating a place. Express-Validator.check is ensuring validity of input
 // Searches for a key in the body named image and extracts image upon creation of new place
-router.post('/', s3upload.upload('image'),
+router.post('/', s3Upload.upload.single('image'),
 [
   check('title').not().isEmpty(),
   check('description').isLength({ min: 5 }),
