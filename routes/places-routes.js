@@ -22,7 +22,7 @@ router.use(checkAuth);
 
 // Midleware function handlingg POST request for creating a place. Express-Validator.check is ensuring validity of input
 // Searches for a key in the body named image and extracts image upon creation of new place
-router.post('/new', s3Upload.upload.single('image'),
+router.post('/', s3Upload.upload.single('image'),
 [
   check('title').not().isEmpty(),
   check('description').isLength({ min: 5 }),
