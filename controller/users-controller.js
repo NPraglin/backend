@@ -66,10 +66,10 @@ const signup = async (req, res, next) => {
     name,
     email,
     password: hashedPassword,
-    image: req.file.path,
+    image: req.file,
     places: []
   });
-  console.log(createdUser)
+  console.log('created user log', createdUser)
   // await and save our user
   try {await createdUser.save()}
   catch (err) {
