@@ -28,7 +28,7 @@ app.use((req, res, next) => {
 
 // Handling images in the middle
 // Builds a new path pointing to images/uploads and any file if requested are returned
-//app.use('/uploads/images', express.static(path.join('uploads', 'images')));
+// app.use('/uploads/images', express.static(path.join('uploads', 'images')));
 
 // Send all requests to that start with /api/places
 app.use('/api/places', placesRoutes);
@@ -41,22 +41,22 @@ app.use('/', (req, res, next) => {
 });
 
 // Middleware function to render error routes
-app.use((error, req, res, next) => {
-  // Checks for file to delete
-  if (req.file) {
-    // Using FS import
-    fs.unlink(req.file.path, (err) => {
-      console.log(err);
-    });
-  }
-  // Check if response already been sent
-  if (res.headerSent) {
-    return next(error)
-  }
-  // If no default response, let's send..
-  res.status(error.status || 500);
-  res.json({message: error.message || 'An unknown error occurred!'});
-})
+// app.use((error, req, res, next) => {
+//   // Checks for file to delete
+//   if (req.file) {
+//     // Using FS import
+//     fs.unlink(req.file.path, (err) => {
+//       console.log(err);
+//     });
+//   }
+//   // Check if response already been sent
+//   if (res.headerSent) {
+//     return next(error)
+//   }
+//   // If no default response, let's send..
+//   res.status(error.status || 500);
+//   res.json({message: error.message || 'An unknown error occurred!'});
+// })
 
 // Initialize DB connection with Mongoose
 mongoose.connect(api.url).then(() => {
