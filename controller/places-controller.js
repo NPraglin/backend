@@ -29,6 +29,9 @@ const getPlaceById = async (req, res, next) => {
 // Handles HTTP Get Req for all places
 const getAllPlaces = async (req, res, next) => {
 
+  // Current authentication error.
+  console.log(await Place.find({}))
+
   let places;
   // Mongoose static method that finds records by ID.. returns place by id
   try {places = await Place.find({})} catch (err) {
