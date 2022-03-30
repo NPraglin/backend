@@ -9,6 +9,9 @@ const s3Upload = require('../middleware/s3-upload');
 
 const router = express.Router();
 
+// Handling rendering ALL places for dev build
+router.get('/all', placesControllers.getAllPlaces)
+
 // Middleware function to return place by placeID
 // Function imported from places-controller
 router.get('/:pid', placesControllers.getPlaceById);

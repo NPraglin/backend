@@ -26,6 +26,24 @@ const getPlaceById = async (req, res, next) => {
     res.json({place: place.toObject({getters: true})}); // => { place: place }
 };
 
+// Handles HTTP Get Req for all places
+const getAllPlaces = async (req, res, next) => {
+
+  let places;
+  // Mongoose static method that finds records by ID.. returns place by id
+  try {places = await Place.find({})} catch (err) {
+    const error = new HttpError('Could not return all places, line 35 places-controller', 500);
+    return next(error);
+  }
+
+  // No place? => error function from import
+  if (!places) {
+    throw new HttpError('Could not find places, line 41.', '404');
+  }
+  // Place? => render place with getters to avoid non-id
+    res.json({places: places.map((place) => place.toObject({getters: true}))}); // => { place: place }
+};
+
 // Exported to places-routes, gets value of parameter in GET request from params
 // Http Get Request returns place
 const getPlacesByUserId = async (req, res, next) => {
@@ -241,3 +259,4 @@ exports.getPlacesByUserId = getPlacesByUserId;
 exports.createPlace = createPlace;
 exports.updatePlace = updatePlace;
 exports.deletePlace = deletePlace;
+exports.getAllPlaces = getAllPlaces;
