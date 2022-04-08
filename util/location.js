@@ -18,10 +18,6 @@ async function getCoordsForAddress(address) {
     throw error;
   }
 
-  console.log('data', data)
-  console.log('data.results', data.results)
-  console.log('data.results[0].coordinates', data.results[0].coordinates)
-
   // First element is coords from google's documentation
   const coordinates = data.results[0].geometry.location;
 
